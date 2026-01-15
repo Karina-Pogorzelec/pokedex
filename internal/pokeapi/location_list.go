@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 )
 
-const baseURL = "https://pokeapi.co/api/v2"
 
 func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 

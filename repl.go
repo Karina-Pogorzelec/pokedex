@@ -27,7 +27,7 @@ func startRepl() {
 
 		command, exists := registry[cleanedText[0]]
 		if exists {
-			err := command.callback(cfg)
+			err := command.callback(cfg, cleanedText[1:])
 			if err != nil {
 				fmt.Println(err)
 			}
