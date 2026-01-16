@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"fmt"
+	"math/rand"
 )
 
 func init() {
@@ -31,6 +32,11 @@ func init() {
 			name: 		"explore",
 			description:"List all the Pokémon located in selected location area",
 			callback:	commandExplore,
+		},
+		"catch": {
+			name: 		"catch",
+			description:"Catch a Pokémon and add it to your collection",
+			callback:	commandCatch,
 		},
 	}
 }
@@ -110,6 +116,39 @@ func commandExplore(cfg *Config, args []string) error {
 
 	for _, enc := range locationResp.PokemonEncounters {
 		fmt.Printf(" - %s\n", enc.Pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandCatch(cfg *Config, args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("Pokemon Name is missing")
+	}
+
+	pokemonName := args[0]
+	pokemonResp, err := cfg.pokeClient.GetPokemon(pokemonName)
+	if err != nil {
+		return err	
+	}
+
+	fmt.Println()
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
+
+	chance := 80 - pokemonResp.BaseExperience/5
+	if chance < 5 {
+		chance = 5
+	}
+	if chance > 90 {
+		chance = 90 
+	}
+
+	randomNumber := rand.Intn(100)
+	if randomNumber < chance {
+		cfg.caughtPokemon[pokemonName] = pokemonResp
+		fmt.Printf("%s was caught!\n", pokemonName)
+	} else {
+		fmt.Printf("%s escaped!\n", pokemonName)
 	}
 
 	return nil
