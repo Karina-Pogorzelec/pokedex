@@ -38,6 +38,16 @@ func init() {
 			description:"Catch a Pokémon and add it to your collection",
 			callback:	commandCatch,
 		},
+		"inspect": {
+			name: 		"inspect",
+			description:"Inspect a caught Pokémon from your collection",
+			callback:	commandInspect,
+		},
+		"pokedex": {
+			name: 		"pokedex",
+			description:"List all the caught Pokémon in your collection",
+			callback:	commandPokedex,
+		},
 	}
 }
 
@@ -151,5 +161,49 @@ func commandCatch(cfg *Config, args []string) error {
 		fmt.Printf("%s escaped!\n", pokemonName)
 	}
 
+	return nil
+}
+
+func commandInspect(cfg *Config, args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("Pokemon Name is missing")
+	}
+
+	pokemonName := args[0]
+	pokemon, ok := cfg.caughtPokemon[pokemonName]
+	if !ok {
+		return fmt.Errorf("Pokemon %s not found in your collection", pokemonName)
+	}
+
+	fmt.Println()
+	fmt.Printf("Inspecting %s...\n", pokemonName)
+	fmt.Println()
+	fmt.Printf("Name: %s\n", pokemon.Name)
+	fmt.Printf("Base Experience: %d\n", pokemon.BaseExperience)
+	fmt.Printf("Height: %d\n", pokemon.Height)
+	fmt.Printf("Weight: %d\n", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range pokemon.Stats {
+		fmt.Printf(" - %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range pokemon.Types {
+		fmt.Printf(" - %s\n", t.Type.Name)
+	}
+
+	return nil
+}
+
+func commandPokedex(cfg *Config, args []string) error {
+
+	if len(cfg.caughtPokemon) == 0 {
+		return fmt.Errorf("No Pokemon caught yet")
+	}
+
+	fmt.Println("Your Pokedex:")
+
+	for _, pokemon := range cfg.caughtPokemon {
+		fmt.Printf("- %s\n", pokemon.Name)
+	}
 	return nil
 }
